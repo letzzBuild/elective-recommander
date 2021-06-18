@@ -15,6 +15,7 @@ import AddElective from './Pages/Admin/Add_elctive';
 import AddUser from './Pages/Admin/Add_user';
 import ElectiveInfo from './Pages/Admin/Elective_info';
 import Electivescore from './Pages/Admin/ElectiveScore_data';
+import FacultyDashboard from './Pages/Faculty/FacultyDashboard';
 
 // import About from './Pages/DashboardPages/about';
 
@@ -39,7 +40,7 @@ function App() {
           <Route path="/admin/Add_user" component={AddUser}></Route>
           <Route path="/admin/Electiveinfo" component={ElectiveInfo}></Route>
           <Route path="/admin/ElectiveScore" component={Electivescore}></Route>
-
+          <Route path="/Faculty/FacultyDashboard" component={FacultyDashboard}></Route>
         </Switch>
       </Router>
     </div>
