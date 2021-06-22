@@ -60,7 +60,7 @@ function Login() {
             localStorage.setItem("dob",response.data.dob);
             localStorage.setItem("gender",response.data.gender);
             localStorage.setItem("role",response.data.role);
-          }
+          
           if (response.data.role === "none") {
             errorToast("You are neither a student nor a faculty member");
             history.push("/");
@@ -71,6 +71,7 @@ function Login() {
           if (response.data.role === "faculty") {
             history.push("/Faculty/FacultyDashboard")
           }
+        }
 
 
         }).catch((error) => {
