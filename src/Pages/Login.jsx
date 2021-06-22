@@ -21,7 +21,7 @@ import Loader from "../reusableComponent/Button";
 function Login() {
   const history = useHistory();
   const [state, setState] = useState(false);
-  const variable1="";
+  var variable1;
 
   const schema = yup.object().shape({
     usn: yup.string().required('This field is required'),
@@ -78,10 +78,6 @@ function Login() {
           errorToast("something went wrong,Check with your connection");
         })
       },
-
-      validationSchema: schema
-
-
     }
   )
 
