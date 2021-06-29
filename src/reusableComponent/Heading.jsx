@@ -5,7 +5,7 @@ export default function Header(props) {
   return (
     <>
       
-        <Typography style={{fontSize:30,fontWeight:'bold'}}>{props.data}</Typography>
+        <Typography style={{fontSize:30,fontWeight:'bold',fontFamily:"Josefin Sans, cursive"}}>{props.data}</Typography>
    
     </>
   );

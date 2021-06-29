@@ -19,7 +19,7 @@ function TextFieldComponent(props) {
 
     < >
       <TextField id="outlined-Basic"
-        style={{ width: props.width, backgroundColor: 'white' }}
+        style={{ width: props.width, backgroundColor: 'white',margin:10}}
         size="small"
         type={props.type}
         rowsMax={props.rowsMax}

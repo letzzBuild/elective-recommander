@@ -20,21 +20,28 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid';
+import Cards from "./studentCard.jsx"
 import "../style.css"
-import {BrowserRouter as Router, Link, withRouter } from "react-router-dom";
+import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
 
 
 const drawerWidth = 240;
 
 const icons = [
-    <LocalLibraryIcon/>,
-    <AddBoxIcon />,
-    <DoneIcon/>,
-    <StarHalfSharpIcon />,
-    <PersonIcon />
+  <LocalLibraryIcon />,
+  <AddBoxIcon />,
+  <DoneIcon />,
+  <StarHalfSharpIcon />,
+  <PersonIcon />
 ]
 
-const routes = ['/dashboard','/Helpme','/ChooseElective','/rating','/about'];
+const routes = ['/dashboard', '/Helpme', '/ChooseElective', '/rating', '/about'];
+const colors = ["#fce4ec", "#e3f2fd", "#f0f4c3", "#b9f6ca", "#d1c4e9", "#ccff90"]
+const subjects = [{"elective_subject":"python","faculty_name":"xyz","ratings":3},
+                  {"elective_subject":"DBMS","faculty_name":"abc","ratings":4},
+                  {"elective_subject":"os","faculty_name":"sdf","ratings":5},
+                  {"elective_subject":"cloud computing","faculty_name":"bnm","ratings":2}]
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function PermanentDrawerLeft({history}) {
+export default function PermanentDrawerLeft({ history }) {
   const classes = useStyles();
 
   return (
@@ -69,19 +76,19 @@ export default function PermanentDrawerLeft({history}) {
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-         <div className="nav-item1">
-         <Typography variant="h6" noWrap>
-            Student DashBoard
-          </Typography>
-         </div>
+          <div className="nav-item1">
+            <Typography variant="h6" noWrap>
+              Student DashBoard
+            </Typography>
+          </div>
 
           <div className="nav-item2">
-              <IconButton>
-          <Avatar src="/broken-image.jpg" >H</Avatar>
-          </IconButton>
+            <IconButton>
+              <Avatar src="/broken-image.jpg" >H</Avatar>
+            </IconButton>
           </div>
           <div>
-              <Button color="inherit">Logout</Button>
+            <Button color="inherit">Logout</Button>
           </div>
         </Toolbar>
       </AppBar>
@@ -96,73 +103,79 @@ export default function PermanentDrawerLeft({history}) {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-         
-            <ListItem button key={0} onClick={()=>history.push(routes[0])}>
-              <ListItemIcon>{icons[0]}</ListItemIcon>
-              <ListItemText primary={"Elective"} />
-            </ListItem>
 
-            <ListItem button key={1} onClick={()=>history.push(routes[1])}>
-              <ListItemIcon>{icons[1]}</ListItemIcon>
-              <ListItemText primary={"Help Me"} />
-            </ListItem>
+          <ListItem button key={0} onClick={() => history.push(routes[0])}>
+            <ListItemIcon>{icons[0]}</ListItemIcon>
+            <ListItemText primary={"Elective"} />
+          </ListItem>
 
-            <ListItem button key={1} onClick={()=>history.push(routes[2])}>
-              <ListItemIcon>{icons[2]}</ListItemIcon>
-              <ListItemText primary={"Choose Elective"} />
-            </ListItem>
+          <ListItem button key={1} onClick={() => history.push(routes[1])}>
+            <ListItemIcon>{icons[1]}</ListItemIcon>
+            <ListItemText primary={"Help Me"} />
+          </ListItem>
 
-            <ListItem button key={1} onClick={()=>history.push(routes[3])}>
-              <ListItemIcon>{icons[3]}</ListItemIcon>
-              <ListItemText primary={"Rate Faculty"} />
-            </ListItem>
+          <ListItem button key={1} onClick={() => history.push(routes[2])}>
+            <ListItemIcon>{icons[2]}</ListItemIcon>
+            <ListItemText primary={"Choose Elective"} />
+          </ListItem>
 
-            <ListItem button key={1} onClick={()=>history.push(routes[4])}>
-              <ListItemIcon>{icons[4]}</ListItemIcon>
-              <ListItemText primary={"About"} />
-            </ListItem>
+          <ListItem button key={1} onClick={() => history.push(routes[3])}>
+            <ListItemIcon>{icons[3]}</ListItemIcon>
+            <ListItemText primary={"Rate Faculty"} />
+          </ListItem>
+
+          <ListItem button key={1} onClick={() => history.push(routes[4])}>
+            <ListItemIcon>{icons[4]}</ListItemIcon>
+            <ListItemText primary={"About"} />
+          </ListItem>
         </List>
         <Divider />
-       
+
       </Drawer>
-      <main className={classes.content}>
+      {/* <main className={classes.content}>
         <div className={classes.toolbar} />
         {/* <Typography paragraph> */}
-          <div main-div style={{width:"100vh",height:"800px",marginTop:"40px",padding:"10px"}}>
+        {/* <div main-div style={{ width: "100vh", height: "800px", marginTop: "40px", padding: "10px" }}>
 
 
           <Grid container spacing={2}>
-                <Grid item xs>
-               <div style={{backgroundColor:'#e1bee7',width:"220px",height:"200px"}}></div>
-        </Grid>
-        <Grid item xs>
-       <div style={{backgroundColor:'#90caf9',width:"220px",height:"200px"}}></div>
-        </Grid>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#e1bee7', width: "220px", height: "200px" }}></div>
+            </Grid>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#90caf9', width: "220px", height: "200px" }}></div>
+            </Grid>
 
-        <Grid item xs>
-               <div style={{backgroundColor:'#f06292',width:"220px",height:"200px"}}></div>
-               </Grid>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#f06292', width: "220px", height: "200px" }}></div>
+            </Grid>
 
-                </Grid>
-                <br/><br/><br/>
-                <Grid container spacing={2}>
-                <Grid item xs>
-               <div style={{backgroundColor:'#f0f4c3',width:"220px",height:"200px"}}></div>
-        </Grid>
-        <Grid item xs>
-       <div style={{backgroundColor:'#69f0ae',width:"220px",height:"200px"}}></div>
-        </Grid>
+          </Grid>
+          <br /><br /><br />
+          <Grid container spacing={2}>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#f0f4c3', width: "220px", height: "200px" }}></div>
+            </Grid>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#69f0ae', width: "220px", height: "200px" }}></div>
+            </Grid>
 
-        <Grid item xs>
-               <div style={{backgroundColor:'#b39ddb',width:"220px",height:"200px"}}></div>
-               </Grid>
+            <Grid item xs>
+              <div style={{ backgroundColor: '#b39ddb', width: "220px", height: "200px" }}></div>
+            </Grid>
 
-                </Grid>
+          </Grid>
 
-          </div>
+        </div> */}
         {/* </Typography> */}
-        
-      </main>
+
+      {/* </main> */} 
+      <div className="dashcontainer">
+                    {
+                        subjects.map((element, i) => <div className="up-cardcontainer" style={{ marginLeft: 50 }}><Cards color={colors[i]} sub={element.elective_subject} faculty={element.faculty_name} rating={element.ratings}   ></Cards></div>)
+
+                    }
+                </div>
     </div>
   );
 }

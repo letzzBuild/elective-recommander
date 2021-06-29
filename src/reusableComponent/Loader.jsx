@@ -1,28 +1,19 @@
+import Loader from "react-loader-spinner";
 import React from 'react';
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
-  },
-}));
-
-export default function SimpleBackdrop() {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  };
+import "../Pages/style.css"
+export default function LoaderComp() {
+  //other logic
   
-  return (
-    <div>
-      
-      <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </div>
-  );
+    return (
+      <div class="loaderdiv">
+      <Loader
+        type="Puff"
+        color="#00BFFF"
+        height={100}
+        width={100}
+        timeout={3000} //3 secs
+      />
+   </div>
+    );
+  
 }

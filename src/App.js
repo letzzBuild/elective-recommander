@@ -16,6 +16,8 @@ import AddUser from './Pages/Admin/Add_user';
 import ElectiveInfo from './Pages/Admin/Elective_info';
 import Electivescore from './Pages/Admin/ElectiveScore_data';
 import FacultyDashboard from './Pages/Faculty/FacultyDashboard';
+import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
 // import About from './Pages/DashboardPages/about';
 
@@ -43,6 +45,7 @@ function App() {
           <Route path="/Faculty/FacultyDashboard" component={FacultyDashboard}></Route>
         </Switch>
       </Router>
+      <ToastContainer />
     </div>
   );
 }
