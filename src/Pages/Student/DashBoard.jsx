@@ -71,6 +71,17 @@ const useStyles = makeStyles((theme) => ({
 export default function PermanentDrawerLeft({ history }) {
   const classes = useStyles();
 
+  useEffect(() => {
+    axios
+       .get('/rating/student/home')
+       .then((response) => {
+      console.log(response.data)
+    })
+    .catch(err=>{
+      console.log(err)
+    })
+},[])
+
   return (
     <div className={classes.root}>
       <CssBaseline />
