@@ -1,30 +1,29 @@
-import React,{useEffect} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import HomeIcon from '@material-ui/icons/Home';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import StarHalfSharpIcon from '@material-ui/icons/StarHalfSharp';
-import PersonIcon from '@material-ui/icons/Person';
-import DoneIcon from '@material-ui/icons/Done';
-import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid';
-import Cards from "./studentCard.jsx"
+import React, { useEffect, useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Drawer from "@material-ui/core/Drawer";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import List from "@material-ui/core/List";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import HomeIcon from "@material-ui/icons/Home";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import StarHalfSharpIcon from "@material-ui/icons/StarHalfSharp";
+import PersonIcon from "@material-ui/icons/Person";
+import DoneIcon from "@material-ui/icons/Done";
+import LocalLibraryIcon from "@material-ui/icons/LocalLibrary";
+import Avatar from "@material-ui/core/Avatar";
+import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import Cards from "./studentCard.jsx";
 import axios from "axios";
-import "../style.css"
+import "../style.css";
 import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
-
 
 const drawerWidth = 240;
 
@@ -33,20 +32,34 @@ const icons = [
   <AddBoxIcon />,
   <DoneIcon />,
   <StarHalfSharpIcon />,
-  <PersonIcon />
-]
+  <PersonIcon />,
+];
 
-const routes = ['/dashboard', '/Helpme', '/ChooseElective', '/rating', '/about'];
-const colors = ["#fce4ec", "#e3f2fd", "#f0f4c3", "#b9f6ca", "#d1c4e9", "#ccff90"]
-const subjects = [{"elective_subject":"python","faculty_name":"xyz","ratings":3},
-                  {"elective_subject":"DBMS","faculty_name":"abc","ratings":4},
-                  {"elective_subject":"os","faculty_name":"sdf","ratings":5},
-                  {"elective_subject":"cloud computing","faculty_name":"bnm","ratings":2}]
-
+const routes = [
+  "/dashboard",
+  "/Helpme",
+  "/ChooseElective",
+  "/rating",
+  "/about",
+];
+const colors = [
+  "#fce4ec",
+  "#e3f2fd",
+  "#f0f4c3",
+  "#b9f6ca",
+  "#d1c4e9",
+  "#ccff90",
+];
+const subjects = [
+  { elective_subject: "python", faculty_name: "xyz", ratings: 3 },
+  { elective_subject: "DBMS", faculty_name: "abc", ratings: 4 },
+  { elective_subject: "os", faculty_name: "sdf", ratings: 5 },
+  { elective_subject: "cloud computing", faculty_name: "bnm", ratings: 2 },
+];
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -68,20 +81,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 export default function PermanentDrawerLeft({ history }) {
   const classes = useStyles();
 
+
+  const [studentCard,setStudentCard] = useState([]);
+
   useEffect(() => {
     axios
-       .get('/rating/student/home')
-       .then((response) => {
-      console.log(response.data)
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-},[])
+      .get("http://127.0.0.1:8000/ratings/student/home")
+      .then((response) => {
+        console.log(response.data);
+        setStudentCard(response.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -96,7 +112,7 @@ export default function PermanentDrawerLeft({ history }) {
 
           <div className="nav-item2">
             <IconButton>
-              <Avatar src="/broken-image.jpg" >H</Avatar>
+              <Avatar src="/broken-image.jpg">H</Avatar>
             </IconButton>
           </div>
           <div>
@@ -115,7 +131,6 @@ export default function PermanentDrawerLeft({ history }) {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-
           <ListItem button key={0} onClick={() => history.push(routes[0])}>
             <ListItemIcon>{icons[0]}</ListItemIcon>
             <ListItemText primary={"Elective"} />
@@ -142,12 +157,11 @@ export default function PermanentDrawerLeft({ history }) {
           </ListItem>
         </List>
         <Divider />
-
       </Drawer>
       {/* <main className={classes.content}>
         <div className={classes.toolbar} />
         {/* <Typography paragraph> */}
-        {/* <div main-div style={{ width: "100vh", height: "800px", marginTop: "40px", padding: "10px" }}>
+      {/* <div main-div style={{ width: "100vh", height: "800px", marginTop: "40px", padding: "10px" }}>
 
 
           <Grid container spacing={2}>
@@ -179,15 +193,21 @@ export default function PermanentDrawerLeft({ history }) {
           </Grid>
 
         </div> */}
-        {/* </Typography> */}
+      {/* </Typography> */}
 
-      {/* </main> */} 
+      {/* </main> */}
       <div className="dashcontainer">
-                    {
-                        subjects.map((element, i) => <div className="up-cardcontainer" style={{ marginLeft: 50 }}><Cards color={colors[i]} sub={element.elective_subject} faculty={element.faculty_name} rating={element.ratings}   ></Cards></div>)
-
-                    }
-                </div>
+        {studentCard.map((element, i) => (
+          <div className="up-cardcontainer">
+            <Cards
+              color={colors[i]}
+              sub={element.elective_name}
+              faculty={element.faculty_name}
+              rating={element.stars}
+            ></Cards>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
