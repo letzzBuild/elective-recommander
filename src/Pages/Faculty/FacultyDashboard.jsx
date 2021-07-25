@@ -24,6 +24,8 @@ import TextField from "../../reusableComponent/TextField"
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
+import errorToast from "../../reusableComponent/errorToast";
+import successToast from "../../reusableComponent/successToast";
 
 
 
@@ -114,6 +116,8 @@ export default function ButtonAppBar() {
 
   const [facultyElectives, setfacultyElectives] = useState(null)
  
+  const [selectedpdf, setselectedpdf] = useState(null)
+  const [selectedVideo, setselectedVideo] = useState(null)
 
   const faculty_id = localStorage.getItem('faculty_id')
 
@@ -126,15 +130,15 @@ export default function ButtonAppBar() {
     })
   }, [])
 
-  // const userType = ['student', 'faculty', 'admin']
+ 
 
-  // const schema = yup.object().shape({
-  //   elective_id: yup.number().required('this field is required'),
-  //   company_names: yup.string().required('this field is required'),
-  //   total_intake: yup.number().required('this field is required'),
-  //   scope: yup.string().required('this field is required'),
-  //   prerequisites: yup.string().required('this field is required'),
-  // });
+  const schema = yup.object().shape({
+    elective_id: yup.number().required('this field is required'),
+    company_names: yup.string().required('this field is required'),
+    total_intake: yup.number().required('this field is required'),
+    scope: yup.string().required('this field is required'),
+    prerequisites: yup.string().required('this field is required'),
+  });
 
 
   const formik = useFormik(
@@ -145,8 +149,7 @@ export default function ButtonAppBar() {
         scope:'',
         prerequisites:'',
         company_names: '',
-        syllabus_pdf:'',
-        introduction_video:''
+        
 
 
       },
@@ -159,30 +162,28 @@ export default function ButtonAppBar() {
         formData.append('scope',data.scope)
         formData.append('prerequisites',data.prerequisites)
         formData.append('company_names',data.company_names)
-        formData.append('syllabus_pdf',data.syllabus_pdf)
-        formData.append('introduction_video',data.introduction_video)
+        formData.append('syllabus_pdf',selectedpdf)
+        formData.append('introduction_video',selectedVideo)
         axios({
           url: '/electives/upload/electiveinfo/',
           method: 'post',
           data: formData,
         }).then((response) => {
+          successToast("successfully recorded elective information")
           console.log(response)
-          // if (response.data.message === "valid user")
-          //     successToast("successfully login");
-          // else
-          //     errorToast("Invalid user name or password");
-
-
+          handleClose()
+          
 
         }).catch((error) => {
           console.log(error)
-          // errorToast("something went wrong");
+          errorToast("something went wrong");
+          handleClose()
         })
 
 
       },
 
-      // validationSchema: schema,
+      validationSchema: schema,
       
     })
 
@@ -204,9 +205,9 @@ export default function ButtonAppBar() {
 
 
   return (
-    console.log(formik),
-    <div>
-      <div className={classes.root}>
+    console.log(selectedVideo),
+    <div >
+      <div className={classes.root} style={{padding:10}} >
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <div className="nav-item1">
@@ -220,7 +221,7 @@ export default function ButtonAppBar() {
           </Toolbar>
         </AppBar>
       </div >
-      <div className="teacher-dashboard">
+      <div className="teacher-dashboard" style={{padding:50}} >
 
         <div className="teacher-div">
           <Grid iteam xs={5}>
@@ -237,7 +238,7 @@ export default function ButtonAppBar() {
                     {facultyElectives && facultyElectives.map((row) => (
                       <TableRow key={row.elective_name}>
                         <TableCell component="th" scope="row">
-                          {row.elective_name}
+                          <h3>{row.elective_name}</h3>
                         </TableCell>
 
                       </TableRow>
@@ -254,7 +255,7 @@ export default function ButtonAppBar() {
                 <Table className={classes.table2} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell ><div style={{ fontSize: 20, textAlign: "center", fontFamily: "italic" }}>Add Elective Imformation</div></TableCell>
+                      <TableCell ><div style={{ fontSize: 20, textAlign: "center", fontFamily: "italic" }}>Add Elective Information</div></TableCell>
 
                     </TableRow>
                   </TableHead>
@@ -262,13 +263,14 @@ export default function ButtonAppBar() {
                     {facultyElectives && facultyElectives.map((row) => (
                       <TableRow key={row.elective_id}>
                         <TableCell style={{ display: "flex", flexDirection: "row", justifyContent: "space-around" }} component="th" scope="row" size="small" >
-                          <h3>{row.elective_name}</h3>
-                          <h4>Elective Id : {row.elective_id}</h4>
-                          <Button variant="contained" color="primary" className="teacherButton" disableElevation onClick={handleOpen}>
+                          <h3 style={{padding:10}}>{row.elective_name}</h3>
+                          
+                          <h4 style={{padding:10}}>Elective Id : {row.elective_id}</h4>
+                          <Button style={{padding:10,width:300,height:50,paddingLeft:30,marginTop:10}} variant="contained" color="primary" className="teacherButton" disableElevation onClick={handleOpen}>
                             Add
                           </Button>
                           <>
-                            <form onSubmit={formik.handleSubmit} >
+          
                               <div className={classes.root}>
                                 <Modal
                                   aria-labelledby="transition-modal-title"
@@ -285,9 +287,7 @@ export default function ButtonAppBar() {
                                   <Fade in={open}>
                                     <div className={classes.paper}>
                                       <h2 id="transition-modal-title">Add Elective Info</h2>
-                                      {/* <form onSubmit={formik.handleSubmit} >
-                                        <div className={classes.root}> */}
-                                       
+                                      <form onSubmit={formik.handleSubmit} >
                                        <div className="textdiv">
                                         <label>Elective Id :</label>
                                         <TextField
@@ -360,42 +360,36 @@ export default function ButtonAppBar() {
                                         <label>Add Video:</label>
 
                                         <TextField
+                                         required
                                           type="file"
-                                          name="syllabus_pdf"
-
-                                          variant="outlined"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.syllabus_pdf}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.syllabus_pdf}
-                                          touched={formik.touched.syllabus_pdf}
+                                          name="introduction_video"
+                                          onChange={(e)=>{setselectedVideo(e.target.files[0])}}
+                                          
                                         />
                                       </div>
                                       <div className="textdiv">
-                                        <label>Add Syllabus:</label>
+                                        <label>Add Syllabus Copy:</label>
                                         {/* <h3 style={{marginRight:"20px"}}>Syllabus(pdf):</h3> */}
                                         <TextField
-                                          name="introduction_video"
+                                          name="syllabus_pdf"
                                           type="file"
-
+                                          required
                                           variant="outlined"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.introduction_video}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.introduction_video}
-                                          touched={formik.touched.introduction_video}
+                                          onChange={(e)=>{setselectedpdf(e.target.files[0])}}
+                                          
                                         />
                                       </div>
                                       <center>
-                                        <Button variant="contained" type="submit" color="primary" style={{ marginTop: 8 }} disableElevation>
+                                        <Button variant="contained" type="submit" color="primary" style={{ marginTop: 8 }} >
                                           Submit
                                         </Button></center>
+                                        </form>
                                     </div>
                                   </Fade>
                                 </Modal>
 
                               </div>
-                            </form>
+                            
                           </>
 
                         </TableCell>
@@ -412,7 +406,7 @@ export default function ButtonAppBar() {
         <div>
           <div className="helpme-div">
 
-            <div className="rating-item1"><h5>Average Rating</h5><hr />
+            <div className="rating-item1"><h5>Average Rating of Faculty</h5><hr />
             <h3>{facultyElectives ? facultyElectives[0].average_rating.stars__avg:0} Stars</h3>
             </div>
           </div>

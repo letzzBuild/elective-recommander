@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -26,9 +26,10 @@ import BUTTON from "..//..//reusableComponent/Button";
 import { useFormik } from "formik";
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from "@material-ui/core/Select";
-
+import axios from 'axios';
 import * as yup from "yup";
-
+import errorToast from "../../reusableComponent/errorToast";
+import successToast from "../../reusableComponent/successToast";
 import "../style.css";
 import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
 
@@ -47,6 +48,8 @@ const routes = [
   "/Helpme",
   "/ChooseElective",
   "/rating",
+  "/recommand"
+
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -74,44 +77,51 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FacultyRating({ history }) {
+
+  const [electives, setelectives] = useState([])
+  const student_id = localStorage.getItem('student_id');
+  useEffect(() => {
+    
+    axios
+      .get(`/electives/semelectives/student/${student_id}`)
+      .then((response) => {
+        console.log(response.data);
+        setelectives(response.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   const classes = useStyles();
 
   const ratings = [1, 2, 3, 4, 5];
 
-  const elective_subject = [
-    {
-      elective_name: "Java",
-      elective_id: 1,
-    },
-    {
-      elective_name: "Computer Graphics",
-      elective_id: 2,
-    },
-    {
-      elective_name: "IoT",
-      elective_id: 3,
-    },
-    {
-      elective_name: "Python",
-      elective_id: 4,
-    },
-  ];
+  
 
   const schema = yup.object().shape({
-    elective_name: yup.string().required("This field is required"),
-    rating: yup.string().required("This field is required"),
+    elective_id: yup.string().required("This field is required"),
+    stars: yup.string().required("This field is required"),
     comments: yup.string().required("This field is required"),
   });
 
   const formik = useFormik({
     initialValues: {
-      elective_name: "",
-      rating: "",
+      elective_id: "",
+      stars: "",
       comments: "",
     },
     validationSchema: schema,
     onSubmit: (data) => {
       console.log(data);
+      data['student_id'] = student_id;
+      axios.post('/ratings/student/rating/',data).then((response) => {
+        console.log(response.data)
+        successToast(response.data)
+      }).catch((error) =>{
+        errorToast("please try again")
+         console.log(error)
+      })
     },
   });
 
@@ -167,7 +177,10 @@ export default function FacultyRating({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          
+          <ListItem button key={1} onClick={() => history.push(routes[4])}>
+            <ListItemIcon>{icons[4]}</ListItemIcon>
+            <ListItemText primary={"Recommander"} />
+          </ListItem>
         </List>
         <Divider />
       </Drawer>
@@ -179,21 +192,21 @@ export default function FacultyRating({ history }) {
 
         <form onSubmit={formik.handleSubmit}>
           <div className="rating_fields">
-            {/* 
+            
         <TextField
             select
             style={{ width: 400,marginBottom:16 }}
             label="Elective Name"
             variant="outlined"
             placeholder="Elective Name"
-            name="elective_name"
+            name="elective_id"
             data={ratings}
             onBlur={formik.handleBlur}
                error={formik.errors.elective_name}
                touched={formik.touched.elective_name}
                onChange={formik.handleChange}
           >
-            {elective_subject.map((ele) => (
+            {electives.map((ele) => (
               <MenuItem key={ele} value={ele.elective_id}>
                 {ele.elective_name}
               </MenuItem>
@@ -207,11 +220,11 @@ export default function FacultyRating({ history }) {
             label="Rating"
             variant="outlined"
             placeholder="Rating"
-            name="rating"
+            name="stars"
             data={ratings}
             onBlur={formik.handleBlur}
-               error={formik.errors.rating}
-               touched={formik.touched.rating}
+               error={formik.errors.stars}
+               touched={formik.touched.stars}
                onChange={formik.handleChange}
           >
             {ratings.map((ele) => (
@@ -219,29 +232,8 @@ export default function FacultyRating({ history }) {
                 {ele}
               </MenuItem>
             ))}
-          </TextField> */}
-        <InputLabel >Elective name</InputLabel>
-            <Select
-              style={{ width: 400 }}
-              id="demo-simple-select-filled"
-              size="small"
-              label="Elective Name"
-              variant="outlined"
-              name="sem"
-              placeholder="Elective Name"
-              values={formik.values.elective_id}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.errors.elective_name}
-              touched={formik.touched.elective_name}
-            >
-              {elective_subject.map((ele) => (
-                <MenuItem key={ele} value={ele.elective_id}>
-                  {ele.elective_name}
-                </MenuItem>
-              ))}
-            </Select>
-
+          </TextField>
+        
             <TextField
               variant="outlined"
               multiline
@@ -255,7 +247,7 @@ export default function FacultyRating({ history }) {
               touched={formik.touched.comments}
             />
 
-            <BUTTON title="Submit" />
+            <BUTTON title="Submit" type="submit" />
           </div>
         </form>
       </main>

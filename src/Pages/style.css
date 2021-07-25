@@ -1,16 +1,10 @@
 .app{
     display: flex;
     justify-content:center;
-    flex-direction:column;
-    align-items: start;
+    align-items: center;
     color: black;
-    
-    background: url('../asserts/loginimg.jpg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    width: 1365px;
-    height: 100vh;
+    margin-top: 200px;
+   
 }
 .log-div{
      
@@ -160,7 +154,7 @@
 }
 .loaderdiv{
     display:flex;
-    flex-direction:center;
+    align-items:center;
     justify-content:center;
 }
 .dashcontainer{

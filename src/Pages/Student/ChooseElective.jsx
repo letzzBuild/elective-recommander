@@ -18,7 +18,7 @@ import LocalLibraryIcon from "@material-ui/icons/LocalLibrary";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
-import Select from "../../reusableComponent/DropDown";
+import Select from "@material-ui/core/Select";
 import BUTTON from "../../reusableComponent/Button";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
@@ -32,6 +32,8 @@ import * as yup from "yup";
 import axios from 'axios';
 import { MenuItem } from "@material-ui/core";
 import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
+import errorToast from "../../reusableComponent/errorToast";
+import successToast from "../../reusableComponent/successToast";
 
 const drawerWidth = 240;
 
@@ -42,13 +44,14 @@ const icons = [
   <StarHalfSharpIcon />,
   <PersonIcon />,
 ];
-const Subjects = ["Java", "python", "Data Structure"];
+
 
 const routes = [
   "/dashboard",
   "/Helpme",
   "/ChooseElective",
   "/rating",
+  "/recommand"
  
 ];
 
@@ -78,10 +81,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ChooseElective({ history }) {
   const [electives, setelectives] = useState([])
-  
+  const student_id = localStorage.getItem('student_id');  
 
   useEffect(() => {
-    const student_id = localStorage.getItem('student_id');
+    
     axios
       .get(`/electives/semelectives/student/${student_id}`)
       .then((response) => {
@@ -90,28 +93,49 @@ export default function ChooseElective({ history }) {
       })
       .catch((err) => {
         console.log(err);
+        errorToast("please try again")
       });
   }, []);
   
 
   const classes = useStyles();
   const schema =yup.object().shape({
-    subject1:yup.string().required("Select option"),
-    subject2:yup.string().required("Select option"),
-    subject3:yup.string().required("Select option"),
-    subject4:yup.string().required("Select option"),
+    elective1:yup.string().required("Select option"),
+    elective2:yup.string().required("Select option"),
+    elective3:yup.string().required("Select option"),
+    priority1:yup.string().required("Select option"),
+    priority2:yup.string().required("Select option"),
+    priority3:yup.string().required("Select option"),
   })
 
   const formik= useFormik({
     initialValues:{
-      subject1:"",
-      subject2:"",
-      subject3:"",
-      subject4:"",
+      elective1:"",
+      elective2:"",
+      elective3:"",
+      priority1:"",
+      priority2:"",
+      priority3:""
     },
     validationSchema:schema,
     onSubmit:(data)=>{
+      var dataToSend = [];
+      var dataobj={}
       console.log(data)
+      for(let i=1;i<=3;i++)
+      {
+       dataobj['elective_name'] = data[`elective${i}`]
+       dataobj['student_id'] = student_id
+       dataobj['priority'] = data[`priority${i}`]
+       dataToSend.push(dataobj)
+       dataobj={}
+      }
+      axios.post('/electives/priority/',dataToSend).then((res)=>{
+             console.log(res)
+             successToast(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
     }
   })
 
@@ -133,7 +157,7 @@ export default function ChooseElective({ history }) {
             </IconButton>
           </div>
           <div>
-            <Button color="inherit">Logout</Button>
+            <Button  color="inherit">Logout</Button>
           </div>
         </Toolbar>
       </AppBar>
@@ -167,13 +191,17 @@ export default function ChooseElective({ history }) {
             <ListItemIcon>{icons[3]}</ListItemIcon>
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
-
+          <ListItem button key={1} onClick={() => history.push(routes[4])}>
+            <ListItemIcon>{icons[4]}</ListItemIcon>
+            <ListItemText primary={"Recommander"} />
+          </ListItem>
           
         </List>
         <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
+        <form onSubmit={formik.handleSubmit}>
         <Typography paragraph>
           <div>
             <h1>Choose Elective</h1>
@@ -186,10 +214,26 @@ export default function ChooseElective({ history }) {
             <h2>Priority</h2>
             </Grid>
                  </Grid>
-
+            
             <Grid container spacing={4}> 
           <Grid item xs={6}>
-          elective_name
+          <Select
+                    style={{ width: 300, backgroundColor: "white" }}
+                    size="small"
+                    label="Choose elective 1"
+                    variant="outlined"
+                    name="elective1"
+                    values={formik.values.elective1}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.elective1}
+                    touched={formik.touched.elective1}
+                  >
+                    {
+                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_name}>{element.elective_name}</MenuItem>)
+
+                    }
+                  </Select>
             </Grid>
             <Grid item xs={6}>
             <div>
@@ -197,8 +241,13 @@ export default function ChooseElective({ history }) {
                   <RadioGroup
                     row
                     aria-label="position"
-                    name="position"
+                    name="priority1"
                     defaultValue="top"
+                    values={formik.values.priority1}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.priority1}
+                    touched={formik.touched.priority1}
                   >
                     <FormControlLabel
                       value="1"
@@ -229,19 +278,22 @@ export default function ChooseElective({ history }) {
            
             <Grid item xs={6}>
             <Select
-             data={electives}
-             width={300}
-             label="Select"
-             name="subject2"
-             
-     
-             
-                values={formik.values.subject2}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.errors.subject2}
-                touched={formik.touched.subject2}
-              />
+                    style={{ width: 300, backgroundColor: "white" }}
+                    size="small"
+                    label="Choose Elective 2 "
+                    variant="outlined"
+                    name="elective2"
+                    values={formik.values.elective2}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.elective2}
+                    touched={formik.touched.elective2}
+                  >
+                    {
+                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_name}>{element.elective_name}</MenuItem>)
+
+                    }
+                  </Select>
             </Grid>
             <Grid item xs={6}>
             <div>
@@ -249,8 +301,13 @@ export default function ChooseElective({ history }) {
                   <RadioGroup
                     row
                     aria-label="position"
-                    name="position"
+                    name="priority2"
                     defaultValue="top"
+                    values={formik.values.priority2}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.priority2}
+                    touched={formik.touched.priority2}
                   >
                     <FormControlLabel
                       value="1"
@@ -283,17 +340,17 @@ export default function ChooseElective({ history }) {
            <Select
                     style={{ width: 300, backgroundColor: "white" }}
                     size="small"
-                    label="Select Elective"
+                    label="Choose Elective 3 "
                     variant="outlined"
-                    name="elective_name"
-                    values={formik.values.elective_name}
+                    name="elective3"
+                    values={formik.values.elective3}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.errors.elective_name}
-                    touched={formik.touched.elective_name}
+                    error={formik.errors.elective3}
+                    touched={formik.touched.elective3}
                   >
                     {
-                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_id}>{element.elective_name}</MenuItem>)
+                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_name}>{element.elective_name}</MenuItem>)
 
                     }
                   </Select>
@@ -304,8 +361,13 @@ export default function ChooseElective({ history }) {
                  <RadioGroup
                    row
                    aria-label="position"
-                   name="position"
+                   name="priority3"
                    defaultValue="top"
+                   values={formik.values.priority3}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.priority3}
+                    touched={formik.touched.priority3}
                  >
                    <FormControlLabel
                      value="1"
@@ -336,11 +398,13 @@ export default function ChooseElective({ history }) {
            <br/> <br/>
            <BUTTON 
            isdisabled={!(formik.dirty && formik.isValid)}
-            title="Submit"/>
-              
+            type="submit"  
+            title="Submit" />
               
                      </div>
+                     
         </Typography>
+        </form>
       </main>
     </div>
   );

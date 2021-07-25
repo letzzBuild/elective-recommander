@@ -77,10 +77,12 @@ function Login() {
             }
 
           }).catch((error) => {
+            setState(false)
             console.log(error.response)
 
             if (error.response.status === 401) {
               errorToast(error.response.data.detail);
+              history.push("/login")
             }
           })
       },
@@ -92,7 +94,7 @@ function Login() {
     <div>
       {
         state ?
-          <div>
+          <div className="loaderdiv">
             <Loader />
           </div>
       :

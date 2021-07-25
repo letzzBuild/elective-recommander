@@ -51,6 +51,7 @@ const routes = [
   "/Helpme",
   "/ChooseElective",
   "/rating",
+  "/recommand"
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -137,7 +138,7 @@ export default function Helpme({ history }) {
             </IconButton>
           </div>
           <div>
-            <Button color="inherit">Logout</Button>
+            <Button color="inherit" >Logout</Button>
           </div>
         </Toolbar>
       </AppBar>
@@ -171,7 +172,11 @@ export default function Helpme({ history }) {
             <ListItemIcon>{icons[3]}</ListItemIcon>
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
-
+        
+          <ListItem button key={1} onClick={() => history.push(routes[4])}>
+            <ListItemIcon>{icons[4]}</ListItemIcon>
+            <ListItemText primary={"Recommander"} />
+          </ListItem>
          
         </List>
         <Divider />

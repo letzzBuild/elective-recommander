@@ -39,7 +39,8 @@ const routes = [
   "/dashboard",
   "/Helpme",
   "/ChooseElective",
-  "/rating"
+  "/rating",
+  "/recommand"
 ];
 const colors = [
   "#fce4ec",
@@ -146,7 +147,10 @@ export default function PermanentDrawerLeft({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          
+          <ListItem button key={1} onClick={() => history.push(routes[4])}>
+            <ListItemIcon>{icons[4]}</ListItemIcon>
+            <ListItemText primary={"Recommander"} />
+          </ListItem>
         </List>
         <Divider />
       </Drawer>
