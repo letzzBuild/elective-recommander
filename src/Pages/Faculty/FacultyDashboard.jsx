@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -48,15 +48,6 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 
-
-
-
-
-
-
-
-
-const Subjects = ["Java", "python", "Data Structure"];
 
 
 
@@ -120,51 +111,66 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ButtonAppBar() {
 
-  localStorage.setItem('IS_LOGGED_IN', 'false')
-  console.log(localStorage.getItem('IS_LOGGED_IN'));
+
+  const [facultyElectives, setfacultyElectives] = useState(null)
+ 
+
+  const faculty_id = localStorage.getItem('faculty_id')
+
+  useEffect(() => {
+    axios.post('electives/assigned/faculty/',{"faculty_id":faculty_id}).then((res)=>{
+       console.log(res)
+       setfacultyElectives(res.data)
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }, [])
 
   // const userType = ['student', 'faculty', 'admin']
 
-  const schema = yup.object().shape({
-    subjectcode: yup.string().required('this field is required'),
-    scopeofsubject: yup.string().required('this field is required'),
-    futurecomponies: yup.string().required('this field is required'),
-    totalmarks: yup.string().required('this field is required'),
-    syllabus: yup.string().required('PDF file is not choose'),
-    video: yup.string().required('video is not choosen')
-  });
+  // const schema = yup.object().shape({
+  //   elective_id: yup.number().required('this field is required'),
+  //   company_names: yup.string().required('this field is required'),
+  //   total_intake: yup.number().required('this field is required'),
+  //   scope: yup.string().required('this field is required'),
+  //   prerequisites: yup.string().required('this field is required'),
+  // });
 
 
   const formik = useFormik(
     {
       initialValues: {
-        subjectCode: '',
-        scopeofSubject: '',
-        futurecomponies: '',
-        totalMarks: '',
+        elective_id:0,
+        total_intake:0,
+        scope:'',
+        prerequisites:'',
+        company_names: '',
+        syllabus_pdf:'',
+        introduction_video:''
+
 
       },
       onSubmit: (data) => {
+        console.log("submitted")
         console.log(data);
+        const formData = new FormData();
+        formData.append('elective_id',data.elective_id)
+        formData.append('total_intake',data.total_intake)
+        formData.append('scope',data.scope)
+        formData.append('prerequisites',data.prerequisites)
+        formData.append('company_names',data.company_names)
+        formData.append('syllabus_pdf',data.syllabus_pdf)
+        formData.append('introduction_video',data.introduction_video)
         axios({
-          url: 'http://127.0.0.1:5000//Faculty/FacultyDashboard',
+          url: '/electives/upload/electiveinfo/',
           method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          data: data
+          data: formData,
         }).then((response) => {
           console.log(response)
           // if (response.data.message === "valid user")
           //     successToast("successfully login");
           // else
           //     errorToast("Invalid user name or password");
-
-          if (response.data.status === 1) {
-            localStorage.setItem('IS_LOGGED_IN', 'true')
-            console.log(localStorage.getItem('IS_LOGGED_IN'));
-          }
-          else {
-            localStorage.setItem('IS_LOGGED_IN', 'false')
-          }
 
 
 
@@ -176,10 +182,8 @@ export default function ButtonAppBar() {
 
       },
 
-      validationSchema: schema,
-      onSubmit: (data) => {
-        console.log(data)
-      }
+      // validationSchema: schema,
+      
     })
 
 
@@ -230,10 +234,10 @@ export default function ButtonAppBar() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.name}>
+                    {facultyElectives && facultyElectives.map((row) => (
+                      <TableRow key={row.elective_name}>
                         <TableCell component="th" scope="row">
-                          {row.name}
+                          {row.elective_name}
                         </TableCell>
 
                       </TableRow>
@@ -255,10 +259,11 @@ export default function ButtonAppBar() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.name}>
+                    {facultyElectives && facultyElectives.map((row) => (
+                      <TableRow key={row.elective_id}>
                         <TableCell style={{ display: "flex", flexDirection: "row", justifyContent: "space-around" }} component="th" scope="row" size="small" >
-                          {row.name}
+                          <h3>{row.elective_name}</h3>
+                          <h4>Elective Id : {row.elective_id}</h4>
                           <Button variant="contained" color="primary" className="teacherButton" disableElevation onClick={handleOpen}>
                             Add
                           </Button>
@@ -279,220 +284,110 @@ export default function ButtonAppBar() {
                                 >
                                   <Fade in={open}>
                                     <div className={classes.paper}>
-                                      <h2 id="transition-modal-title">Add Subjects!!</h2>
+                                      <h2 id="transition-modal-title">Add Elective Info</h2>
                                       {/* <form onSubmit={formik.handleSubmit} >
                                         <div className={classes.root}> */}
-                                      <div className="textdiv">
-                                        <label >Subject Code:</label>
+                                       
+                                       <div className="textdiv">
+                                        <label>Elective Id :</label>
                                         <TextField
-                                          label="Subject Code"
+                                          label="elective id"
                                           variant="outlined"
-                                          name="subjectcode"
+                                          name="elective_id"
                                           onChange={formik.handleChange}
-                                          value={formik.values.usn}
+                                          value={formik.values.elective_id}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div>
-                                      <div className="textdiv">
-                                        <label>Scope of Subject:</label>
-                                        <TextField
-                                          label="Scope of Subject"
-                                          variant="outlined"
-                                          name="scopeofsubject"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.usn}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div>
-                                      <div className="textdiv">
-                                        <label>Future componies:</label>
-                                        <TextField
-                                          label="Future componies"
-                                          variant="outlined"
-                                          name="futurecomponies"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.usn}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div >
-                                      <div className="textdiv">
-                                        <label>Total Marks:</label>
-                                        <TextField
-
-                                          label="Total Marks"
-                                          variant="outlined"
-                                          name="totalmarks"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.usn}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div>
-                                      <div className="textdiv">
-                                        <label>Add Video:</label>
-
-                                        <TextField
-                                          type="file"
-                                          name="video"
-
-                                          variant="outlined"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.usn}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div>
-                                      <div className="textdiv">
-                                        <label>Add Syllabus:</label>
-                                        {/* <h3 style={{marginRight:"20px"}}>Syllabus(pdf):</h3> */}
-                                        <TextField
-                                          name="syllabus"
-                                          type="file"
-
-                                          variant="outlined"
-                                          onChange={formik.handleChange}
-                                          value={formik.values.usn}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.usn}
-                                          touched={formik.touched.usn}
-                                        />
-                                      </div>
-                                      <center>
-                                        <Button variant="contained" color="primary" style={{ marginTop: 8 }} disableElevation>
-                                          Submit
-                                        </Button></center>
-                                    </div>
-                                  </Fade>
-                                </Modal>
-
-                              </div>
-                            </form>
-                          </>
-                          <Button variant="contained" color="primary" className="teacherButton" disableElevation onClick={handleOpen} >
-                            Update
-                          </Button>
-                          <>
-                            <form onSubmit={formik.handleSubmit} >
-                              <div className={classes.root}>
-                                <Modal
-                                  aria-labelledby="transition-modal-title"
-                                  aria-describedby="transition-modal-description"
-                                  className={classes.modal}
-                                  open={open}
-                                  onClose={handleClose}
-                                  closeAfterTransition
-                                  BackdropComponent={Backdrop}
-                                  BackdropProps={{
-                                    timeout: 500,
-                                  }}
-                                >
-                                  <Fade in={open}>
-                                    <div className={classes.paper}>
-                                      <h2 id="transition-modal-title">Add Subjects!!</h2>
-                                      {/* <form onSubmit={formik.handleSubmit} >
-                                        <div className={classes.root}> */}
-                                      <div className="textdiv">
-                                        <label >Subject Code:</label>
-                                        <TextField
-                                        
-                                        defaultValue="18cs61"
-                                         label="Subject Code"
-                                          variant="outlined"
-                                          name="subjectcode"
+                                          error={formik.errors.elective_id}
+                                          touched={formik.touched.elective_id}
                                           
-                                          onChange={formik.handleChange}
-                                          value={formik.values.subjectcode}
-                                          onBlur={formik.handleBlur}
-                                          error={formik.errors.subjectcode}
-                                          touched={formik.touched.subjectcode}
                                         />
                                       </div>
+
                                       <div className="textdiv">
                                         <label>Scope of Subject:</label>
                                         <TextField
                                           label="Scope of Subject"
                                           variant="outlined"
-                                          name="scopeofsubject"
-                                          defaultValue="XYZ"
+                                          name="scope"
                                           onChange={formik.handleChange}
-                                          value={formik.values.scopeofsubject}
+                                          value={formik.values.scope}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.scopeofsubject}
-                                          touched={formik.touched.scopeofsubject}
+                                          error={formik.errors.scope}
+                                          touched={formik.touched.scope}
                                         />
                                       </div>
                                       <div className="textdiv">
-                                        <label>Future componies:</label>
+                                        <label>Job opportunities:</label>
                                         <TextField
-                                          label="Future componies"
+                                          label="Job opportunities"
                                           variant="outlined"
-                                          name="futurecomponies"
-                                          defaultValue="HP"
+                                          name="company_names"
                                           onChange={formik.handleChange}
-                                          value={formik.values.futurecomponies}
+                                          value={formik.values.company_names}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.futurecomponies}
-                                          touched={formik.touched.futurecomponies}
+                                          error={formik.errors.company_names}
+                                          touched={formik.touched.company_names}
                                         />
                                       </div >
                                       <div className="textdiv">
-                                        <label>Total Marks:</label>
+                                        <label>Total Intake</label>
                                         <TextField
-
-                                          label="Total Marks"
+                                          label="Total Intake"
                                           variant="outlined"
-                                          name="totalmarks"
-                                          defaultValue="63"
+                                          name="total_intake"
                                           onChange={formik.handleChange}
-                                          value={formik.values.totalmarks}
+                                          value={formik.values.total_intake}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.totalmarks}
-                                          touched={formik.touched.totalmarks}
+                                          error={formik.errors.total_intake}
+                                          touched={formik.touched.total_intake}
                                         />
                                       </div>
+                                      <div className="textdiv">
+                                        <label>Prerequisites</label>
+                                        <TextField
+                                          label="Prerequisites"
+                                          variant="outlined"
+                                          name="prerequisites"
+                                          onChange={formik.handleChange}
+                                          value={formik.values.prerequisites}
+                                          onBlur={formik.handleBlur}
+                                          error={formik.errors.prerequisites}
+                                          touched={formik.touched.prerequisites}
+                                        />
+                                      </div>
+                                
                                       <div className="textdiv">
                                         <label>Add Video:</label>
 
                                         <TextField
                                           type="file"
-                                          name="video"
-                                          width={222}
+                                          name="syllabus_pdf"
+
                                           variant="outlined"
                                           onChange={formik.handleChange}
-                                          value={formik.values.video}
+                                          value={formik.values.syllabus_pdf}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.video}
-                                          touched={formik.touched.video}
+                                          error={formik.errors.syllabus_pdf}
+                                          touched={formik.touched.syllabus_pdf}
                                         />
                                       </div>
                                       <div className="textdiv">
                                         <label>Add Syllabus:</label>
                                         {/* <h3 style={{marginRight:"20px"}}>Syllabus(pdf):</h3> */}
                                         <TextField
-                                          name="syllabus"
-                                          width={222}
-                                          type="file"                                         
+                                          name="introduction_video"
+                                          type="file"
+
                                           variant="outlined"
                                           onChange={formik.handleChange}
-                                          value={formik.values.file}
+                                          value={formik.values.introduction_video}
                                           onBlur={formik.handleBlur}
-                                          error={formik.errors.file}
-                                          touched={formik.touched.file}
+                                          error={formik.errors.introduction_video}
+                                          touched={formik.touched.introduction_video}
                                         />
                                       </div>
                                       <center>
-                                        <Button variant="contained" color="primary" style={{ marginTop: 8 }} disableElevation
-                                        type="submit"
-                                        title="submit"
-                                        disabled={!formik.dirty && !formik.isValid}>
+                                        <Button variant="contained" type="submit" color="primary" style={{ marginTop: 8 }} disableElevation>
                                           Submit
                                         </Button></center>
                                     </div>
@@ -517,48 +412,15 @@ export default function ButtonAppBar() {
         <div>
           <div className="helpme-div">
 
-            <div className="rating-item1"><h5>Average Rating</h5><hr /></div>
-            <div className="subject-item2"><h5>Select Elective Subject</h5><hr />
-              <Select
-                data={Subjects}
-                width={300}
-                label="Select"
-                name="subject2"
-                style={{ lineHeight: 1 }}
-              ></Select>
+            <div className="rating-item1"><h5>Average Rating</h5><hr />
+            <h3>{facultyElectives ? facultyElectives[0].average_rating.stars__avg:0} Stars</h3>
             </div>
-
           </div>
 
         </div>
       </div>
       <br></br>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>USN</StyledTableCell>
-              <StyledTableCell align="right">Name</StyledTableCell>
-              <StyledTableCell align="right">Subject</StyledTableCell>
-              <StyledTableCell align="right">Project</StyledTableCell>
-              <StyledTableCell align="right">Sem</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows1.map((row) => (
-              <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">
-                  {row.name}
-                </StyledTableCell>
-                <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                <StyledTableCell align="right">{row.fat}</StyledTableCell>
-                <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="right">{row.protein}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      
     </div>
 
 

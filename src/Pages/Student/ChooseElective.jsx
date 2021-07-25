@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useEffect, useState }from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -29,6 +29,8 @@ import { useFormik } from "formik";
 import Grid from "@material-ui/core/Grid";
 import "../style.css";
 import * as yup from "yup";
+import axios from 'axios';
+import { MenuItem } from "@material-ui/core";
 import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
 
 const drawerWidth = 240;
@@ -47,7 +49,7 @@ const routes = [
   "/Helpme",
   "/ChooseElective",
   "/rating",
-  "/about",
+ 
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -75,6 +77,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ChooseElective({ history }) {
+  const [electives, setelectives] = useState([])
+  
+
+  useEffect(() => {
+    const student_id = localStorage.getItem('student_id');
+    axios
+      .get(`/electives/semelectives/student/${student_id}`)
+      .then((response) => {
+        console.log(response.data);
+        setelectives(response.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  
+
   const classes = useStyles();
   const schema =yup.object().shape({
     subject1:yup.string().required("Select option"),
@@ -149,10 +168,7 @@ export default function ChooseElective({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          <ListItem button key={1} onClick={() => history.push(routes[4])}>
-            <ListItemIcon>{icons[4]}</ListItemIcon>
-            <ListItemText primary={"About"} />
-          </ListItem>
+          
         </List>
         <Divider />
       </Drawer>
@@ -173,20 +189,7 @@ export default function ChooseElective({ history }) {
 
             <Grid container spacing={4}> 
           <Grid item xs={6}>
-            <Select
-                data={Subjects}
-                width={300}
-                label="Select"
-                name="subject1"
-                
-        
-                
-                   values={formik.values.subject1}
-                   onChange={formik.handleChange}
-                   onBlur={formik.handleBlur}
-                   error={formik.errors.subject1}
-                   touched={formik.touched.subject1}
-              />
+          elective_name
             </Grid>
             <Grid item xs={6}>
             <div>
@@ -215,12 +218,7 @@ export default function ChooseElective({ history }) {
                       label="3"
                       labelPlacement="bottom"
                     />
-                    <FormControlLabel
-                      value="end"
-                      control={<Radio color="primary" />}
-                      label="4"
-                      labelPlacement="bottom"
-                    />
+                    
                   </RadioGroup>
                 </FormControl>
               </div>
@@ -231,7 +229,7 @@ export default function ChooseElective({ history }) {
            
             <Grid item xs={6}>
             <Select
-             data={Subjects}
+             data={electives}
              width={300}
              label="Select"
              name="subject2"
@@ -272,12 +270,7 @@ export default function ChooseElective({ history }) {
                       label="3"
                       labelPlacement="bottom"
                     />
-                    <FormControlLabel
-                      value="end"
-                      control={<Radio color="primary" />}
-                      label="4"
-                      labelPlacement="bottom"
-                    />
+                    
                   </RadioGroup>
                 </FormControl>
               </div>
@@ -288,19 +281,22 @@ export default function ChooseElective({ history }) {
            
            <Grid item xs={6}>
            <Select
-           data={Subjects}
-           width={300}
-           label="Select"
-           name="subject3"
-           
-   
-           
-              values={formik.values.subject3}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.errors.subject3}
-              touched={formik.touched.subject3}
-             />
+                    style={{ width: 300, backgroundColor: "white" }}
+                    size="small"
+                    label="Select Elective"
+                    variant="outlined"
+                    name="elective_name"
+                    values={formik.values.elective_name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.elective_name}
+                    touched={formik.touched.elective_name}
+                  >
+                    {
+                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_id}>{element.elective_name}</MenuItem>)
+
+                    }
+                  </Select>
            </Grid>
            <Grid item xs={6}>
            <div>
@@ -329,74 +325,14 @@ export default function ChooseElective({ history }) {
                      label="3"
                      labelPlacement="bottom"
                    />
-                   <FormControlLabel
-                     value="end"
-                     control={<Radio color="primary" />}
-                     label="4"
-                     labelPlacement="bottom"
-                   />
+                   
                  </RadioGroup>
                </FormControl>
              </div>
            </Grid>
            </Grid>
            <br/>
-           <Grid container spacing={4}> 
            
-           <Grid item xs={6}>
-           <Select
-            data={Subjects}
-            width={300}
-            label="Select"
-            name="subject4"
-            
-    
-            
-               values={formik.values.subject4}
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               error={formik.errors.subject4}
-               touched={formik.touched.subject4}
-             />
-           </Grid>
-           <Grid item xs={6}>
-           <div>
-               <FormControl component="fieldset">
-                 <RadioGroup
-                   row
-                   aria-label="position"
-                   name="position"
-                   defaultValue="top"
-                 >
-                   <FormControlLabel
-                     value="1"
-                     control={<Radio color="primary" />}
-                     label="1"
-                     labelPlacement="Bottom"
-                   />
-                   <FormControlLabel
-                     value="2"
-                     control={<Radio color="primary" />}
-                     label="2"
-                     labelPlacement="bottom"
-                   />
-                   <FormControlLabel
-                     value="3"
-                     control={<Radio color="primary" />}
-                     label="3"
-                     labelPlacement="bottom"
-                   />
-                   <FormControlLabel
-                     value="end"
-                     control={<Radio color="primary" />}
-                     label="4"
-                     labelPlacement="bottom"
-                   />
-                 </RadioGroup>
-               </FormControl>
-             </div>
-           </Grid>
-           </Grid>
            <br/> <br/>
            <BUTTON 
            isdisabled={!(formik.dirty && formik.isValid)}

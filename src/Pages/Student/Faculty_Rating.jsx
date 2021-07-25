@@ -47,7 +47,6 @@ const routes = [
   "/Helpme",
   "/ChooseElective",
   "/rating",
-  "/about",
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -168,10 +167,7 @@ export default function FacultyRating({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          <ListItem button key={1} onClick={() => history.push(routes[4])}>
-            <ListItemIcon>{icons[4]}</ListItemIcon>
-            <ListItemText primary={"About"} />
-          </ListItem>
+          
         </List>
         <Divider />
       </Drawer>

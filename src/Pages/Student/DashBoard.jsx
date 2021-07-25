@@ -39,8 +39,7 @@ const routes = [
   "/dashboard",
   "/Helpme",
   "/ChooseElective",
-  "/rating",
-  "/about",
+  "/rating"
 ];
 const colors = [
   "#fce4ec",
@@ -50,12 +49,7 @@ const colors = [
   "#d1c4e9",
   "#ccff90",
 ];
-const subjects = [
-  { elective_subject: "python", faculty_name: "xyz", ratings: 3 },
-  { elective_subject: "DBMS", faculty_name: "abc", ratings: 4 },
-  { elective_subject: "os", faculty_name: "sdf", ratings: 5 },
-  { elective_subject: "cloud computing", faculty_name: "bnm", ratings: 2 },
-];
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,8 +82,9 @@ export default function PermanentDrawerLeft({ history }) {
   const [studentCard,setStudentCard] = useState([]);
 
   useEffect(() => {
+    const student_id = localStorage.getItem('student_id');
     axios
-      .get("http://127.0.0.1:8000/ratings/student/home")
+      .get(`/ratings/student/home/${student_id}/`)
       .then((response) => {
         console.log(response.data);
         setStudentCard(response.data)
@@ -151,10 +146,7 @@ export default function PermanentDrawerLeft({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          <ListItem button key={1} onClick={() => history.push(routes[4])}>
-            <ListItemIcon>{icons[4]}</ListItemIcon>
-            <ListItemText primary={"About"} />
-          </ListItem>
+          
         </List>
         <Divider />
       </Drawer>
@@ -200,10 +192,11 @@ export default function PermanentDrawerLeft({ history }) {
         {studentCard.map((element, i) => (
           <div className="up-cardcontainer">
             <Cards
+              key={i}
               color={colors[i]}
               sub={element.elective_name}
               faculty={element.faculty_name}
-              rating={element.stars}
+              rating={element.ratings}
             ></Cards>
           </div>
         ))}

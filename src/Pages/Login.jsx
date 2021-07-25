@@ -57,16 +57,20 @@ function Login() {
               localStorage.setItem("dob", response.data.dob);
               localStorage.setItem("gender", response.data.gender);
               localStorage.setItem("role", response.data.role);
+              
+              
 
 
               if (response.data.role === "none") {
                 errorToast("You are neither a student nor a faculty member");
               }
               if (response.data.role === "student") {
+                localStorage.setItem("student_id",response.data.student_id)
                 successToast("successfully login");
                 history.push("/dashboard")
               }
               if (response.data.role === "faculty") {
+                localStorage.setItem("faculty_id",response.data.faculty_id)
                 successToast("successfully login");
                 history.push("/Faculty/FacultyDashboard")
               }
@@ -138,7 +142,7 @@ function Login() {
                 title="Login" onClick={handleClick}
                 width={300}
               />
-              <Link to="/Signup"><h5>Don't have account? SignUp</h5></Link>
+              
 
 
             </form>

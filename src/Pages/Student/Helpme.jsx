@@ -1,4 +1,4 @@
-import React,{useEffect} from "react";
+import React,{useEffect,useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -23,12 +23,17 @@ import Select from '@material-ui/core/Select';
 import BUTTON from "..//..//reusableComponent/Button";
 import Grid from "@material-ui/core/Grid";
 import Chart from "react-google-charts";
+import TextField from '@material-ui/core/TextField';
 import "../style.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
 import MenuItem from '@material-ui/core/MenuItem';
 import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
+import errorToast from "../../reusableComponent/errorToast";
+import successToast from "../../reusableComponent/successToast";
+import ReactPlayer from 'react-player/lazy';
+import IP from '../../constants';
 
 const drawerWidth = 240;
 
@@ -41,17 +46,11 @@ const icons = [
 ];
 
 
-//const Subjects = ["Java", "python", "Data Structure"];
-
-const data = [{ "elective_id": 1, "elective_name": "internet of things", "elective_short_name": "IOT" },
-{ "elective_id": 2, "elective_name": "advance java", "elective_short_name": "AdvJAVA" }]
-
 const routes = [
   "/dashboard",
   "/Helpme",
   "/ChooseElective",
   "/rating",
-  "/about",
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -80,27 +79,43 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Helpme({ history }) {
   const classes = useStyles();
+  const [electives, setelectives] = useState([])
+  const [report, setreport] = useState(null)
 
   useEffect(() => {
+    const student_id = localStorage.getItem('student_id');
     axios
-       .get('/electives/allelectives')
-       .then((response) => {
-      console.log(response.data)
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-},[])
+      .get(`/electives/semelectives/student/${student_id}`)
+      .then((response) => {
+        console.log(response.data);
+        setelectives(response.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const schema = yup.object().shape({
-    sem: yup.string().required('Select the field'),
+    elective_id: yup.string().required('This is required field'),
+    cgpa:yup.number().required('Enter a valid cgpa'),
   })
 
   const formik = useFormik({
     initialValues: {
-      sem: "",
+      elective_id: 0,
+      cgpa:""
     },
     validationSchema: schema,
+    onSubmit:(data)=>{
+      console.log(data);
+      axios.post('/electives/elective/report/',data).then((res)=>{
+        console.log(res.data) 
+        setreport(res.data)
+         successToast("successfully fetched report")
+      }).catch((err)=>{
+        errorToast("failed to fetch report,please try again");   
+      })
+    }
     
   }
   )
@@ -157,51 +172,66 @@ export default function Helpme({ history }) {
             <ListItemText primary={"Rate Faculty"} />
           </ListItem>
 
-          <ListItem button key={1} onClick={() => history.push(routes[4])}>
-            <ListItemIcon>{icons[4]}</ListItemIcon>
-            <ListItemText primary={"About"} />
-          </ListItem>
+         
         </List>
         <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Typography paragraph>
-          <form onSubmit={formik.handleSubmit}>
             <div className="helpme-main-div">
               <h3>Select elective</h3>
+              <form onSubmit={formik.handleSubmit}>
               <Grid container spacing={10}>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Select
                     style={{ width: 300, backgroundColor: "white" }}
                     size="small"
-                    label="select subject"
+                    label="select elective"
                     variant="outlined"
-                    name="sem"
-                    values={formik.values.sem}
+                    name="elective_id"
+                    values={formik.values.elective_id}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.errors.sem}
-                    touched={formik.touched.sem}
+                    error={formik.errors.elective_id}
+                    touched={formik.touched.elective_id}
                   >
                     {
-                      data.map((element) => <MenuItem key={element.elective_short_name} value={element.elective_id}>{element.elective_name}</MenuItem>)
+                      electives.map((element) => <MenuItem key={element.elective_name} value={element.elective_id}>{element.elective_name}</MenuItem>)
 
                     }
                   </Select>
                 </Grid>
-                <Grid item xs={6}>
-                  <BUTTON title="submit" width="250px" isdisabled={(!formik.dirty && formik.isValid)} 
+                <Grid item xs={4}>
+
+                <TextField
+                    style={{ width: 300, backgroundColor: "white" }}
+                    
+                    label="enter cgpa"
+                    variant="outlined"
+                    name="cgpa"
+                    values={formik.values.cgpa}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.cgpa}
+                    touched={formik.touched.cgpa}
+                  />
+
+                </Grid>
+
+                <Grid item xs={4}>
+                  <BUTTON title="submit" type="submit" width="250px" isdisabled={(!formik.dirty && formik.isValid)} 
                     />
                 </Grid>
-              </Grid>
+                </Grid>
+                </form>
               <br /><br />
 
 
 
 
 
-              <div>
+              {/* <div>
 
                 <Chart
                   width={"600px"}
@@ -264,37 +294,59 @@ export default function Helpme({ history }) {
                   rootProps={{ "data-testid": "4" }}
                   legendToggle
                 />
-              </div>
+              </div> */}
               <br /><br />
               <div className="helpme-dashboard">
                 <div className="helepme-head"><h3>Detail analysis of the elective choosen</h3></div>
                 <br />
                 <div className="helpme-div">
                   <div className="helpme-item1"><h5>Subject Name</h5>
-                    <hr /></div>
-                  <div className="helpme-item1"><h5>Faculty Name</h5><hr /></div>
-                  <div className="helpme-item1"><h5>Ratings</h5><hr /></div>
-                  <div className="helpme-item1"><h5>Scope of Subject</h5><hr /></div>
+                    <hr />
+                    <h5>{report ? report.elective_name : ""}</h5>
+                    </div>
+                  <div className="helpme-item1"><h5>Faculty Name</h5><hr />
+                  <h5>{report ? report.faculty_name : ""}</h5>
+                  </div>
+                  <div className="helpme-item1"><h5>Ratings</h5><hr />
+                  <h5>{report ? report.rating['stars__avg'] : ""}</h5>
+                  </div>
+                  <div className="helpme-item1"><h5>Scope of Subject</h5><hr />
+                  <h5>{report ? report.scope : ""}</h5>
+                  </div>
                 </div>
                 <br />
                 <div className="helpme-div">
-                  <div className="helpme-item2"><h5>Syllabus</h5><hr /></div>
-                  <div className="helpme-item2"><h5>Companies</h5><hr /></div>
-                  <div className="helpme-item2">Add video</div>
+                  <div className="helpme-item2"><h5>Syllabus Copy</h5><hr />
+                  
+                  <a href={report? IP+report.syllabus_pdf:""}><BUTTON title="Download Pdf" type="submit" width="200px"  /></a>
+                  </div>
+                  <div className="helpme-item2"><h5>Companies</h5><hr />
+                  <h5>{report ? report.company_names : ""}</h5>
+                  </div>
+                  <div className="helpme-item2">
+                   <h5>Video</h5><hr />
+                  <a href={report? IP+report.introduction_video:""}><BUTTON title="Watch Video" type="submit" width="200px"  /></a>
+                  </div>
 
                 </div>
                 <br />
                 <div className="helpme-div">
-                  <div className="helpme-item2"><h5>prerequists</h5><hr /></div>
-                  <div className="helpme-item2"><h5>Your predicted Score</h5><hr /></div>
-                  <div className="helpme-item2"><h5>Total Intake</h5><hr /></div>
-
+                  <div className="helpme-item2"><h5>prerequists</h5><hr />
+                  <h5>{report ? report.prerequisites : ""}</h5>
+                  </div>
+                  <div className="helpme-item2"><h5>Your predicted Score</h5><hr />
+                  <h5>{report ? report.predicted_score : ""}</h5>
+                  </div>
+                  <div className="helpme-item2"><h5>Total Intake</h5><hr />
+                  <h5>{report ? report.total_intake : ""}</h5>
+                  </div>
+                  
                 </div>
 
               </div>
             </div>
 
-          </form>
+          
         </Typography>
       </main>
     </div>
